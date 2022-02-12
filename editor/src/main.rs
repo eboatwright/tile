@@ -31,6 +31,17 @@ async fn main() {
         set_camera(&camera);
 
         clear_background(BLACK);
+        for y in 0..tilemap.tiles[0].len() {
+            for x in 0..tilemap.tiles[0][0].len() {
+                draw_rectangle_lines(
+                    x as f32 * tilemap.tile_size as f32,
+                    y as f32 * tilemap.tile_size as f32,
+                    17.0, 17.0,
+                    1.05,
+                    LIGHTGRAY,
+                );
+            }
+        }
         tilemap.render(TilemapRenderParams::default());
 
         set_default_camera();
