@@ -18,7 +18,7 @@ pub async fn load_tilemap(path: String) -> Tilemap {
     let mut tilemap: Vec<Vec<Vec<u16>>> = Vec::new();
 
     // Split the file into layers
-    let layers: Vec<&str> = split[2].split('~').collect();
+    let layers: Vec<&str> = split[3].split('~').collect();
     for layer in layers.iter() {
         let mut tile_rows: Vec<Vec<u16>> = Vec::new();
         // Split the layer into rows
@@ -38,7 +38,7 @@ pub async fn load_tilemap(path: String) -> Tilemap {
     let texture = load_texture(split[1]).await.unwrap();
     Tilemap {
         texture,
-        tile_size: texture.height() as u16,
+        tile_size: split[2].parse::<u16>().unwrap(),
         tiles: tilemap,
     }
 }

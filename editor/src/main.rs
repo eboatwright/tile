@@ -21,11 +21,7 @@ async fn main() {
         ..Default::default()
     };
 
-    let tilemap = Tilemap {
-        texture: load_texture("tileset.png").await.unwrap(),
-        tile_size: 16,
-        tiles: load_tilemap("current.tilemap".to_string()).await,
-    };
+    let tilemap = load_tilemap("current.tilemap".to_string()).await;
 
     loop {
         set_camera(&camera);
