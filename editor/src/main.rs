@@ -7,11 +7,12 @@ struct Master {
     mouse_down_pos: Vec2,
     selected_tile: u16,
     selected_layer: usize,
+    show_grid: bool,
 }
 
 fn window_conf() -> Conf {
     Conf {
-        window_title: "Tile Editor - v0.0.0".to_string(),
+        window_title: "Tile Editor - v0.2.0".to_string(),
         window_width: 960,
         window_height: 600,
         window_resizable: false,
@@ -32,6 +33,7 @@ async fn main() {
         mouse_down_pos: Vec2::ZERO,
         selected_tile: 1,
         selected_layer: 0,
+        show_grid: true,
     };
     master.tilemap.texture.set_filter(FilterMode::Nearest);
 
@@ -58,6 +60,21 @@ fn update(master: &mut Master) {
         master.camera_pos = master.mouse_down_pos - vec2(480.0, 300.0) - get_mouse_position();
     }
 
+    if is_key_pressed(KeyCode::A) {
+        if master.selected_layer == 0 {
+            master.selected_layer = master.tilemap.tiles.len() - 1;
+        } else {
+            master.selected_layer -= 1;
+        }
+    }
+    if is_key_pressed(KeyCode::S) {
+        if master.selected_layer == master.tilemap.tiles.len() - 1 {
+            master.selected_layer = 0;
+        } else {
+            master.selected_layer -= 1;
+        }
+    }
+
     if is_key_pressed(KeyCode::Q) {
         master.selected_tile -= 1;
         if master.selected_tile < 1 {
@@ -78,28 +95,34 @@ fn update(master: &mut Master) {
     if is_mouse_button_down(MouseButton::Right) {
         set_tile_at_mouse(master, 0);
     }
+
+    if is_key_pressed(KeyCode::G) {
+        master.show_grid = !master.show_grid;
+    }
 }
 
 fn render(master: &Master) {
     clear_background(BLACK);
-    for y in 0..master.tilemap.tiles[0].len() {
-        for x in 0..master.tilemap.tiles[0][0].len() {
-            draw_rectangle_lines(
-                x as f32 * master.tilemap.tile_size as f32,
-                y as f32 * master.tilemap.tile_size as f32,
-                master.tilemap.tile_size as f32 + 1.0, master.tilemap.tile_size as f32 + 1.0,
-                1.05,
-                LIGHTGRAY,
-            );
+    if master.show_grid {
+        for y in 0..master.tilemap.tiles[0].len() {
+            for x in 0..master.tilemap.tiles[0][0].len() {
+                draw_rectangle_lines(
+                    x as f32 * master.tilemap.tile_size as f32,
+                    y as f32 * master.tilemap.tile_size as f32,
+                    master.tilemap.tile_size as f32 + 1.0, master.tilemap.tile_size as f32 + 1.0,
+                    1.05,
+                    LIGHTGRAY,
+                );
+            }
         }
     }
     master.tilemap.render(TilemapRenderParams::default());
 
-    let mouse_pos = (get_mouse_position() + master.camera_pos - vec2(240.0, 150.0)) / 16.0 - vec2(0.5, 0.5);
+    let mouse_pos = (get_mouse_position() + master.camera_pos - vec2(240.0, 150.0)) / (master.tilemap.tile_size as f32) - vec2(0.5, 0.5);
     draw_texture_ex(
         master.tilemap.texture,
-        clamp(mouse_pos.x.round(), 0.0, (master.tilemap.tiles[master.selected_layer][0].len() - 1) as f32) * 16.0,
-        clamp(mouse_pos.y.round(), 0.0, (master.tilemap.tiles[master.selected_layer].len() - 1) as f32) * 16.0,
+        clamp(mouse_pos.x.round(), 0.0, (master.tilemap.tiles[master.selected_layer][0].len() - 1) as f32) * (master.tilemap.tile_size as f32),
+        clamp(mouse_pos.y.round(), 0.0, (master.tilemap.tiles[master.selected_layer].len() - 1) as f32) * (master.tilemap.tile_size as f32),
         Color {
             r: 1.0,
             g: 1.0,
@@ -123,7 +146,7 @@ fn get_mouse_position() -> Vec2 {
 }
 
 fn set_tile_at_mouse(master: &mut Master, value: u16) {
-    let mut mouse_pos = (get_mouse_position() + master.camera_pos - vec2(240.0, 150.0)) / 16.0 - vec2(0.5, 0.5);
+    let mut mouse_pos = (get_mouse_position() + master.camera_pos - vec2(240.0, 150.0)) / (master.tilemap.tile_size as f32) - vec2(0.5, 0.5);
     mouse_pos = vec2(
         clamp(mouse_pos.x.round(), 0.0, (master.tilemap.tiles[master.selected_layer][0].len() - 1) as f32),
         clamp(mouse_pos.y.round(), 0.0, (master.tilemap.tiles[master.selected_layer].len() - 1) as f32),
