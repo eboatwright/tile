@@ -47,10 +47,18 @@ fn update(master: &mut Master) {
         master.camera_pos = Vec2::ZERO;
     }
     if is_mouse_button_pressed(MouseButton::Middle) {
-        master.mouse_down_pos = master.camera_pos + vec2(480.0, 300.0) + Vec2::from(mouse_position()) * 0.5;
+        master.mouse_down_pos = master.camera_pos + vec2(480.0, 300.0) + get_mouse_position();
     }
     if is_mouse_button_down(MouseButton::Middle) {
-        master.camera_pos = master.mouse_down_pos - vec2(480.0, 300.0) - Vec2::from(mouse_position()) * 0.5;
+        master.camera_pos = master.mouse_down_pos - vec2(480.0, 300.0) - get_mouse_position();
+    }
+
+    if is_mouse_button_down(MouseButton::Left) {
+        set_tile_at_mouse(master, 1);
+    }
+
+    if is_mouse_button_down(MouseButton::Right) {
+        set_tile_at_mouse(master, 0);
     }
 }
 
@@ -68,4 +76,13 @@ fn render(master: &Master) {
         }
     }
     master.tilemap.render(TilemapRenderParams::default());
+}
+
+fn get_mouse_position() -> Vec2 {
+    Vec2::from(mouse_position()) * 0.5
+}
+
+fn set_tile_at_mouse(master: &mut Master, value: u16) {
+    let mouse_pos = get_mouse_position() + master.camera_pos - vec2(240.0, 150.0);
+    master.tilemap.tiles[0][(mouse_pos.y / 16.0) as usize][(mouse_pos.x / 16.0) as usize] = value;
 }
