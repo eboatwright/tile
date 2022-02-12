@@ -5,6 +5,8 @@ struct Master {
     tilemap: Tilemap,
     camera_pos: Vec2,
     mouse_down_pos: Vec2,
+    selected_tile: u16,
+    selected_layer: usize,
 }
 
 fn window_conf() -> Conf {
@@ -28,7 +30,10 @@ async fn main() {
         tilemap: load_tilemap("current.tilemap".to_string()).await,
         camera_pos: Vec2::ZERO,
         mouse_down_pos: Vec2::ZERO,
+        selected_tile: 1,
+        selected_layer: 0,
     };
+    master.tilemap.texture.set_filter(FilterMode::Nearest);
 
     loop {
         update(&mut master);
@@ -53,8 +58,21 @@ fn update(master: &mut Master) {
         master.camera_pos = master.mouse_down_pos - vec2(480.0, 300.0) - get_mouse_position();
     }
 
+    if is_key_pressed(KeyCode::Q) {
+        master.selected_tile -= 1;
+        if master.selected_tile <= 0 {
+            master.selected_tile = (master.tilemap.texture.width() / master.tilemap.tile_size as f32).round() as u16;
+        }
+    }
+    if is_key_pressed(KeyCode::W) {
+        master.selected_tile += 1;
+        if master.selected_tile >= (master.tilemap.texture.width() / master.tilemap.tile_size as f32).round() as u16 {
+            master.selected_tile = 1;
+        }
+    }
+
     if is_mouse_button_down(MouseButton::Left) {
-        set_tile_at_mouse(master, 1);
+        set_tile_at_mouse(master, master.selected_tile);
     }
 
     if is_mouse_button_down(MouseButton::Right) {
@@ -76,6 +94,28 @@ fn render(master: &Master) {
         }
     }
     master.tilemap.render(TilemapRenderParams::default());
+
+    let mouse_pos = (get_mouse_position() + master.camera_pos - vec2(240.0, 150.0)) / 16.0 - vec2(0.5, 0.5);
+    draw_texture_ex(
+        master.tilemap.texture,
+        clamp(mouse_pos.x.round(), 0.0, (master.tilemap.tiles[master.selected_layer][0].len() - 1) as f32) * 16.0,
+        clamp(mouse_pos.y.round(), 0.0, (master.tilemap.tiles[master.selected_layer].len() - 1) as f32) * 16.0,
+        Color {
+            r: 1.0,
+            g: 1.0,
+            b: 1.0,
+            a: 0.5,
+        },
+        DrawTextureParams {
+            source: Some(Rect {
+                x: (master.selected_tile * master.tilemap.tile_size) as f32,
+                y: 0.0,
+                w: master.tilemap.tile_size as f32,
+                h: master.tilemap.tile_size as f32,
+            }),
+            ..Default::default()
+        },
+    );
 }
 
 fn get_mouse_position() -> Vec2 {
@@ -83,6 +123,10 @@ fn get_mouse_position() -> Vec2 {
 }
 
 fn set_tile_at_mouse(master: &mut Master, value: u16) {
-    let mouse_pos = get_mouse_position() + master.camera_pos - vec2(240.0, 150.0);
-    master.tilemap.tiles[0][(mouse_pos.y / 16.0) as usize][(mouse_pos.x / 16.0) as usize] = value;
+    let mut mouse_pos = (get_mouse_position() + master.camera_pos - vec2(240.0, 150.0)) / 16.0;
+    mouse_pos = vec2(
+        clamp(mouse_pos.x.round(), 0.0, (master.tilemap.tiles[master.selected_layer][0].len() - 1) as f32),
+        clamp(mouse_pos.y.round(), 0.0, (master.tilemap.tiles[master.selected_layer].len() - 1) as f32),
+    );
+    master.tilemap.tiles[master.selected_layer][mouse_pos.y as usize][mouse_pos.x as usize] = value;
 }
