@@ -1,6 +1,8 @@
 animating tiles
-tile collision physics
+tile collision physics?
 
 tile editor:
 	saving
 	loading
+	selecting layers
+	rendering non selected layers at different opacities
