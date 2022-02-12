@@ -9,13 +9,13 @@ pub async fn load_tilemap(path: String) -> Vec<Vec<Vec<u16>>> {
 
     let mut tilemap: Vec<Vec<Vec<u16>>> = Vec::new();
 
-    let layers: Vec<&str> = file.split("~").collect();
+    let layers: Vec<&str> = file.split('~').collect();
     for layer in layers.iter() {
         let mut tile_rows: Vec<Vec<u16>> = Vec::new();
-        let rows: Vec<&str> = layer.split("/").collect();
+        let rows: Vec<&str> = layer.split('/').collect();
         for row in rows.iter() {
             let mut tile_row: Vec<u16> = Vec::new();
-            let tiles: Vec<&str> = row.split(",").collect();
+            let tiles: Vec<&str> = row.split(',').collect();
             for tile in tiles {
                 tile_row.push(tile.parse::<u16>().unwrap());
             }
