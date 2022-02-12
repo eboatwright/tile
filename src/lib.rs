@@ -52,24 +52,45 @@ impl Default for Tilemap {
     }
 }
 
+#[derive(Copy, Clone, PartialEq)]
+pub struct TilemapRenderParams {
+    // The minimum and maximum render positions in units of the tile size
+    pub min_tile_render_pos: Vec2,
+    pub max_tile_render_pos: Vec2,
+    pub min_render_layer: usize,
+    pub max_render_layer: usize,
+}
+
+// This is just so if you want to render the whole thing, you just say TilemapRenderParams::default()
+impl Default for TilemapRenderParams {
+    fn default() -> Self {
+        Self {
+            min_tile_render_pos: Vec2::ZERO,
+            max_tile_render_pos: vec2(f32::MAX, f32::MAX),
+            min_render_layer: 0,
+            max_render_layer: usize::MAX,
+        }
+    }
+}
+
 impl Tilemap {
-    pub fn render(&self, mut min_render_tile_pos: Vec2, mut max_render_tile_pos: Vec2, mut min_render_layer: usize, mut max_render_layer: usize) {
+    pub fn render(&self, mut params: TilemapRenderParams) {
         // This just makes sure that the positions and ranges aren't too big or too small
-        min_render_tile_pos = vec2(
-            clamp(min_render_tile_pos.x, 0.0, self.tiles[0][0].len() as f32),
-            clamp(min_render_tile_pos.y, 0.0, self.tiles[0].len() as f32),
+        params.min_tile_render_pos = vec2(
+            clamp(params.min_tile_render_pos.x, 0.0, self.tiles[0][0].len() as f32),
+            clamp(params.min_tile_render_pos.y, 0.0, self.tiles[0].len() as f32),
         );
-        max_render_tile_pos = vec2(
-            clamp(max_render_tile_pos.x, 0.0, self.tiles[0][0].len() as f32),
-            clamp(max_render_tile_pos.y, 0.0, self.tiles[0].len() as f32),
+        params.max_tile_render_pos = vec2(
+            clamp(params.max_tile_render_pos.x, 0.0, self.tiles[0][0].len() as f32),
+            clamp(params.max_tile_render_pos.y, 0.0, self.tiles[0].len() as f32),
         );
 
-        min_render_layer = clamp(min_render_layer, 0, self.tiles.len());
-        max_render_layer = clamp(max_render_layer, 0, self.tiles.len());
+        params.min_render_layer = clamp(params.min_render_layer, 0, self.tiles.len());
+        params.max_render_layer = clamp(params.max_render_layer, 0, self.tiles.len());
 
-        for z in min_render_layer..max_render_layer {
-            for y in min_render_tile_pos.y as usize..max_render_tile_pos.y as usize {
-                for x in min_render_tile_pos.x as usize..max_render_tile_pos.x as usize {
+        for z in params.min_render_layer..params.max_render_layer {
+            for y in params.min_tile_render_pos.y as usize..params.max_tile_render_pos.y as usize {
+                for x in params.min_tile_render_pos.x as usize..params.max_tile_render_pos.x as usize {
                     // Don't render if it's not zero
                     if self.tiles[z][y][x] != 0 {
                         draw_texture_ex(
