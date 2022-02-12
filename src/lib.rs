@@ -2,11 +2,13 @@ use macroquad::prelude::*;
 use macroquad::file::load_string;
 
 pub async fn load_tilemap(path: String) -> Vec<Vec<Vec<u16>>> {
-    let tilemap: Vec<Vec<Vec<u16>>> = Vec::new();
-
     let file = load_string(&path).await.unwrap();
+    if file.len() == 0 {
+        return Vec::new();
+    }
 
-    let mut tile_layers: Vec<Vec<Vec<u16>>> = Vec::new();
+    let mut tilemap: Vec<Vec<Vec<u16>>> = Vec::new();
+
     let layers: Vec<&str> = file.split("~").collect();
     for layer in layers.iter() {
         let mut tile_rows: Vec<Vec<u16>> = Vec::new();
@@ -19,7 +21,7 @@ pub async fn load_tilemap(path: String) -> Vec<Vec<Vec<u16>>> {
             }
             tile_rows.push(tile_row);
         }
-        tile_layers.push(tile_rows);
+        tilemap.push(tile_rows);
     }
 
     tilemap
