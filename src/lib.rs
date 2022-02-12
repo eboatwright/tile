@@ -103,8 +103,8 @@ impl Tilemap {
                     if self.tiles[z][y][x] != 0 {
                         draw_texture_ex(
                             self.texture,
-                            x as f32 * self.tile_size as f32,
-                            y as f32 * self.tile_size as f32,
+                            (x as f32 * self.tile_size as f32).round(),
+                            (y as f32 * self.tile_size as f32).round(),
                             WHITE,
                             DrawTextureParams {
                                 source: Some(Rect {

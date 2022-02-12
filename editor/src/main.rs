@@ -12,7 +12,7 @@ fn window_conf() -> Conf {
         window_title: "Tile Editor - v0.0.0".to_string(),
         window_width: 960,
         window_height: 600,
-        window_resizable: true,
+        window_resizable: false,
         ..Default::default()
     }
 }
