@@ -1,6 +1,7 @@
 (REMOVE THIS IF YOU'RE ACTUALLY GOING TO USE THIS!)
-the ~ stands for the end of a layer
-the / stands for the end of a row
-the , stands for the end of a tile
+put " around your tileset's file name
+the ~ stands for the seam between layers
+the / stands for the seam between rows
+the , stands for the seam between tiles
 
-0,0,0,0,0/0,0,0,0,0/0,0,0,0,0~0,0,0,0,0/0,0,0,0,0/0,0,0,0,0
+"tileset.png"0,0,0,0,0/0,0,0,0,0/0,0,0,0,0~0,0,0,0,0/0,0,0,0,0/0,0,0,0,0

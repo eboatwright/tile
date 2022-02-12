@@ -3,19 +3,22 @@ use macroquad::prelude::*;
 use macroquad::file::load_string;
 
 // This has to be async because of Macroquad
-pub async fn load_tilemap(path: String) -> Vec<Vec<Vec<u16>>> {
+pub async fn load_tilemap(path: String) -> Tilemap {
     let file = load_string(&path).await.unwrap();
     // Make sure the file isn't empty
     if file.len() == 0 {
-        return Vec::new();
+        panic!("Cannot load tilemap, file is empty!");
     }
+
+    // The split between the tileset's file name and tiles
+    let split: Vec<&str> = file.split('"').collect();
 
     // This section converts the file into a Vec<Vec<Vec<16>>>
 
     let mut tilemap: Vec<Vec<Vec<u16>>> = Vec::new();
 
     // Split the file into layers
-    let layers: Vec<&str> = file.split('~').collect();
+    let layers: Vec<&str> = split[2].split('~').collect();
     for layer in layers.iter() {
         let mut tile_rows: Vec<Vec<u16>> = Vec::new();
         // Split the layer into rows
@@ -32,7 +35,12 @@ pub async fn load_tilemap(path: String) -> Vec<Vec<Vec<u16>>> {
         tilemap.push(tile_rows);
     }
 
-    tilemap
+    let texture = load_texture(split[1]).await.unwrap();
+    Tilemap {
+        texture,
+        tile_size: texture.height() as u16,
+        tiles: tilemap,
+    }
 }
 
 #[derive(Clone, PartialEq)]

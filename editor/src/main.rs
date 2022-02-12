@@ -36,7 +36,7 @@ async fn main() {
                 draw_rectangle_lines(
                     x as f32 * tilemap.tile_size as f32,
                     y as f32 * tilemap.tile_size as f32,
-                    17.0, 17.0,
+                    tilemap.tile_size as f32 + 1.0, tilemap.tile_size as f32 + 1.0,
                     1.05,
                     LIGHTGRAY,
                 );
