@@ -1,3 +1,6 @@
+use std::path::Path;
+use std::io::Write;
+use std::fs::File;
 use tile::*;
 use macroquad::prelude::*;
 
@@ -8,6 +11,19 @@ struct Master {
     selected_tile: u16,
     selected_layer: usize,
     show_grid: bool,
+}
+
+impl Default for Master {
+    fn default() -> Self {
+        Self {
+            tilemap: Tilemap::default(),
+            camera_pos: Vec2::ZERO,
+            mouse_down_pos: Vec2::ZERO,
+            selected_tile: 1,
+            selected_layer: 0,
+            show_grid: true,
+        }
+    }
 }
 
 fn window_conf() -> Conf {
@@ -27,14 +43,13 @@ async fn main() {
         ..Default::default()
     };
 
-    let mut master = Master {
-        tilemap: load_tilemap("current.tilemap".to_string()).await,
-        camera_pos: Vec2::ZERO,
-        mouse_down_pos: Vec2::ZERO,
-        selected_tile: 1,
-        selected_layer: 0,
-        show_grid: true,
-    };
+    let mut master = Master::default();
+
+    if !Path::new("current.tilemap").exists() {
+        save(&master);
+    }
+
+    master.tilemap = load_tilemap("current.tilemap".to_string()).await;
     master.tilemap.texture.set_filter(FilterMode::Nearest);
 
     loop {
@@ -50,9 +65,6 @@ async fn main() {
 }
 
 fn update(master: &mut Master) {
-    if is_key_pressed(KeyCode::Space) {
-        master.camera_pos = Vec2::ZERO;
-    }
     if is_mouse_button_pressed(MouseButton::Middle) {
         master.mouse_down_pos = master.camera_pos + vec2(480.0, 300.0) + get_mouse_position();
     }
@@ -68,10 +80,14 @@ fn update(master: &mut Master) {
         }
     }
     if is_key_pressed(KeyCode::S) {
-        if master.selected_layer == master.tilemap.tiles.len() - 1 {
-            master.selected_layer = 0;
+        if is_key_down(KeyCode::LeftShift) {
+            save(master);
         } else {
-            master.selected_layer += 1;
+            if master.selected_layer == master.tilemap.tiles.len() - 1 {
+                master.selected_layer = 0;
+            } else {
+                master.selected_layer += 1;
+            }
         }
     }
 
@@ -185,4 +201,11 @@ fn set_tile_at_mouse(master: &mut Master, value: u16) {
         clamp(mouse_pos.y.round(), 0.0, (master.tilemap.tiles[master.selected_layer].len() - 1) as f32),
     );
     master.tilemap.tiles[master.selected_layer][mouse_pos.y as usize][mouse_pos.x as usize] = value;
+}
+
+fn save(master: &Master) {
+    let mut save_file = File::create(get_file_path("current.tilemap".to_string())).unwrap();
+    let mut save = "\"".to_string();
+    save += &format!("{}\"", master.tilemap.tile_size);
+    write!(save_file, "{}", save).unwrap();
 }
