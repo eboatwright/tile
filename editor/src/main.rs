@@ -207,5 +207,18 @@ fn save(master: &Master) {
     let mut save_file = File::create(get_file_path("current.tilemap".to_string())).unwrap();
     let mut save = "\"".to_string();
     save += &format!("{}\"", master.tilemap.tile_size);
+    for z in 0..master.tilemap.tiles.len() {
+        for y in 0..master.tilemap.tiles[z].len() {
+            for x in 0..master.tilemap.tiles[z][y].len() {
+                save += &format!("{}", master.tilemap.tiles[z][y][x]);
+                save += ",";
+            }
+            save.pop();
+            save += "/";
+        }
+        save.pop();
+        save += "~";
+    }
+    save.pop();
     write!(save_file, "{}", save).unwrap();
 }
