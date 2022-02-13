@@ -28,7 +28,7 @@ impl Default for Master {
 
 fn window_conf() -> Conf {
     Conf {
-        window_title: "Tile Editor - v0.2.0".to_string(),
+        window_title: "Tile Editor - v0.3.0".to_string(),
         window_width: 960,
         window_height: 600,
         window_resizable: false,
