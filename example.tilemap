@@ -1,7 +1,10 @@
 (REMOVE THIS IF YOU'RE ACTUALLY GOING TO USE THIS!)
-put " around your tileset's file name, tile size and tiles
+put " around your tile size and tiles
 the ~ stands for the seam between layers
 the / stands for the seam between rows
 the , stands for the seam between tiles
 
-"tileset.png"16"0,0,0,0,0/0,0,0,0,0/0,0,0,0,0~0,0,0,0,0/0,0,0,0,0/0,0,0,0,0
+MAKE SURE THAT EACH LAYER IS THE SAME SIZE!
+                        |                  |
+                        \/                 \/
+"16"0,0,0,0,0/0,0,0,0,0/0,0,0,0,0~0,0,0,0,0/0,0,0,0,0/0,0,0,0,0
