@@ -1,0 +1,11 @@
+!!! DISCLAIMER !!!
+	This editor is made mainly for my own use. It is not very user-friendly!
+
+Click and drag the middle mouse button to view
+Left click to draw tiles
+Right click to erase tiles
+Q and W to select the current tile
+A and S to select the current layer
+The editor will automatically load a file named current.tilemap
+If there's not a file named current.tilemap an empty one will be created
+Check example.tilemap for instruction on making files
