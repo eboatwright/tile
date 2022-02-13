@@ -71,7 +71,7 @@ fn update(master: &mut Master) {
         if master.selected_layer == master.tilemap.tiles.len() - 1 {
             master.selected_layer = 0;
         } else {
-            master.selected_layer -= 1;
+            master.selected_layer += 1;
         }
     }
 
@@ -116,7 +116,40 @@ fn render(master: &Master) {
             }
         }
     }
-    master.tilemap.render(TilemapRenderParams::default());
+    // I'm doing custom rendering so I can gray out other layers
+    // master.tilemap.render(TilemapRenderParams::default());
+    for z in 0..master.tilemap.tiles.len() {
+        for y in 0..master.tilemap.tiles[z].len() {
+            for x in 0..master.tilemap.tiles[z][y].len() {
+                if master.tilemap.tiles[z][y][x] != 0 {
+                    draw_texture_ex(
+                        master.tilemap.texture,
+                        (x as f32 * master.tilemap.tile_size as f32).round(),
+                        (y as f32 * master.tilemap.tile_size as f32).round(),
+                        if z == master.selected_layer {
+                            WHITE
+                        } else {
+                            Color {
+                                r: 0.9,
+                                g: 0.9,
+                                b: 0.9,
+                                a: 0.5,
+                            }
+                        },
+                        DrawTextureParams {
+                            source: Some(Rect {
+                                x: ((master.tilemap.tiles[z][y][x] - 1) * master.tilemap.tile_size) as f32,
+                                y: 0.0,
+                                w: master.tilemap.tile_size as f32,
+                                h: master.tilemap.tile_size as f32,
+                            }),
+                            ..Default::default()
+                        },
+                    );
+                }
+            }
+        }
+    }
 
     let mouse_pos = (get_mouse_position() + master.camera_pos - vec2(240.0, 150.0)) / (master.tilemap.tile_size as f32) - vec2(0.5, 0.5);
     draw_texture_ex(
